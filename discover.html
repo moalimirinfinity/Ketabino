@@ -6,69 +6,60 @@
     <title>Discover - Ketabino</title>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/feather-icons"></script>
     <style>
         /* Discover Page Specific Styles */
         .discover-header {
-            padding: 1.5rem 0;
-            text-align: center; /* For search bar centering */
+            padding: 1rem 0 1.5rem 0; /* Reduced padding */
+            text-align: center;
+        }
+        .search-bar-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
         }
         .search-bar {
             width: 100%;
-            max-width: 600px;
-            padding: 0.9rem 1.2rem;
-            font-size: 1.1rem;
-            border-radius: var(--border-radius-lg);
+            padding: 0.8rem 1rem 0.8rem 2.5rem; /* Padding for icon */
+            font-size: 1rem;
+            border-radius: var(--border-radius-lg); /* More rounded */
             border: 1px solid var(--subtle-border);
-            margin-bottom: 1.5rem;
         }
-        .search-bar:focus {
-             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(26, 83, 92, 0.2);
-        }
-
-        .filter-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .filter-tabs .btn {
-            background-color: var(--card-bg);
+        .search-bar-container i.feather-search {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--text-muted);
-            border: 1px solid var(--subtle-border);
-            font-weight: 600;
-        }
-        .filter-tabs .btn.active,
-        .filter-tabs .btn:hover {
-            background-color: var(--primary-color);
-            color: var(--text-light);
-            border-color: var(--primary-color);
+            width: 1.1rem;
+            height: 1.1rem;
         }
 
         .book-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem; /* Increased gap */
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Slightly smaller min for more items */
+            gap: 1.75rem; /* Increased gap */
         }
 
         .book-card {
             background-color: var(--card-bg);
-            border-radius: var(--border-radius-md);
+            border-radius: var(--border-radius-md); /* Consistent with other cards */
             box-shadow: var(--shadow-sm);
-            overflow: hidden; /* To contain badge and image */
+            overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
         }
         .book-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px); /* Slightly more lift */
             box-shadow: var(--shadow-md);
         }
         .book-card .cover-image-container {
             position: relative;
             width: 100%;
-            aspect-ratio: 3 / 4; /* For uniform book covers */
-            background-color: var(--subtle-border); /* Placeholder bg */
+            aspect-ratio: 2 / 3; /* Common book cover ratio */
+            background-color: var(--subtle-border);
         }
         .book-card .cover-image-container img {
             width: 100%;
@@ -77,218 +68,132 @@
         }
         .book-card .summary-length-badge {
             position: absolute;
-            bottom: 0.5rem;
-            right: 0.5rem;
-            padding: 0.25em 0.6em;
-            font-size: 0.7rem;
+            bottom: 0.6rem;
+            right: 0.6rem;
+            padding: 0.3em 0.65em;
         }
         .book-card .card-content {
             padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Allow content to grow */
         }
         .book-card .book-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1rem; /* Adjusted size */
+            font-weight: 600;
             color: var(--text-dark);
             margin-bottom: 0.25rem;
-            line-height: 1.3;
-            /* Truncate */
+            line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            min-height: 2.6em; /* for 2 lines */
+            min-height: 2.8em; /* for 2 lines */
+            flex-grow: 1; /* Push author and actions down */
         }
         .book-card .book-author {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             margin-bottom: 0.75rem;
         }
         .book-card .card-actions {
             display: flex;
-            justify-content: flex-start; /* Or space-between if preferred */
-            gap: 0.5rem; /* Space between icons */
+            justify-content: flex-end; /* Align to right */
+            gap: 0.5rem;
+            margin-top: auto; /* Push actions to bottom */
         }
-         .book-card .card-actions .btn-icon {
-            padding: 0.4rem; /* Slightly smaller padding */
-            border-radius: 50%; /* Make icon buttons circular */
-            background-color: transparent;
-         }
-         .book-card .card-actions .btn-icon:hover {
-            background-color: var(--subtle-border);
-         }
-         .book-card .card-actions .btn-icon svg {
-            width: 18px;
-            height: 18px;
-         }
-         /* Desktop hover overlay for icons */
-        @media (min-width: 768px) {
-            .book-card .cover-image-container .actions-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(26, 83, 92, 0.7); /* Primary color with alpha */
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 1rem;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-            .book-card:hover .cover-image-container .actions-overlay {
-                opacity: 1;
-            }
-            .book-card .cover-image-container .actions-overlay .btn-icon {
-                color: var(--text-light);
-                background-color: rgba(255,255,255,0.2);
-            }
-             .book-card .cover-image-container .actions-overlay .btn-icon:hover {
-                background-color: rgba(255,255,255,0.4);
-            }
-            .book-card .card-actions { /* Hide on desktop if overlay is used */
-                display: none;
-            }
+        .book-card .card-actions .btn-icon {
+            padding: 0.4rem;
         }
-         @media (max-width: 767px) { /* Mobile: actions always visible below */
-            .book-card .cover-image-container .actions-overlay {
-                display: none;
-            }
-            .book-card .card-actions {
-                display: flex; /* Ensure visible on mobile */
-            }
-         }
+        .book-card .card-actions .btn-icon.saved i.feather-bookmark {
+            fill: var(--secondary-color);
+            stroke: var(--secondary-color);
+        }
+        .book-card .card-actions .btn-icon.downloaded i.feather-download {
+             fill: var(--primary-color);
+             stroke: var(--primary-color);
+             color: var(--text-light); /* If fill is dark */
+        }
+
+        /* Modal Specifics for Book Detail */
+        #bookDetailModal .modal-content {
+            max-width: 750px; /* Wider for book details */
+        }
+        .modal-book-cover img {
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            max-width: 220px; /* Limit cover size */
+            margin: 0 auto 1rem auto; /* Center on mobile */
+        }
+        @media (min-width: 768px) { /* Desktop layout for modal */
+            .modal-book-layout { display: flex; gap: 2rem; }
+            .modal-book-cover { flex-basis: 35%; text-align: left; }
+            .modal-book-cover img { margin: 0; }
+            .modal-book-info { flex-basis: 65%; }
+        }
+        .modal-book-info .book-title { font-size: 1.75rem; margin-bottom: 0.25rem; }
+        .modal-book-info .book-author { font-size: 1rem; color: var(--text-muted); margin-bottom: 0.75rem;}
+        .modal-book-info .action-buttons { margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;}
+
+        #summaryReaderView, #summaryListenerView {
+            margin-top:1.5rem;
+            border-top: 1px solid var(--subtle-border);
+            padding-top: 1.5rem;
+        }
+        #summaryReaderView h4, #summaryListenerView h4 { margin-bottom: 1rem; }
+        #summaryTextContent {
+            background-color: var(--neutral-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius-md);
+            min-height: 120px;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; }
+        #postSummaryOptions, #postListenOptions {
+            margin-top:1.5rem; text-align:center; padding-top: 1.5rem;
+            border-top:1px solid var(--subtle-border);
+        }
+        #postSummaryOptions h5, #postListenOptions h5 { margin-bottom:1rem; color:var(--text-muted); }
 
     </style>
 </head>
 <body>
     <nav class="main-nav">
-        <div class="container">
-            <a href="discover.html" class="logo">Ketabino</a>
-            <div class="nav-links">
-                <a href="discover.html" class="active">Discover</a>
-                <a href="library.html">Library</a>
-                <a href="me.html">Me</a>
-            </div>
-            <div class="user-actions">
-                <span class="streak-indicator">🔥 5 days</span>
-                <div class="user-avatar-container">
-                    <div class="user-avatar" style="background-image: url('assets/images/avatar-placeholder.png');" tabindex="0">
-                        <span class="visually-hidden">User menu</span>
-                    </div>
-                    <div class="user-dropdown">
-                        <a href="me.html">Profile</a>
-                        <a href="#settings">Settings</a>
-                        <a href="login.html" id="logoutButton">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+        </nav>
 
     <div class="streak-progress-bar-container">
-        <div class="container">
-            <div class="streak-progress-bar" title="Day 5 of reading streak"></div>
         </div>
-    </div>
 
     <main class="container">
         <header class="discover-header">
-            <input type="search" class="search-bar" placeholder="Search for books, authors, or topics...">
-            <div class="filter-tabs">
-                <button class="btn active" data-filter="all">All</button>
-                <button class="btn" data-filter="categories">Categories</button>
-                <button class="btn" data-filter="trending">Trending</button>
-                <button class="btn" data-filter="new">New Releases</button>
+            <div class="search-bar-container">
+                <i data-feather="search" class="feather-search"></i>
+                <input type="search" id="searchBarInput" class="search-bar form-control" placeholder="Search for books, authors, or topics...">
+            </div>
+            <div class="tabs-nav" id="filterTabsNav">
+                <button class="tab-link active" data-filter="all">All</button>
+                <button class="tab-link" data-filter="categories">Categories</button>
+                <button class="tab-link" data-filter="trending">Trending</button>
+                <button class="tab-link" data-filter="new">New Releases</button>
             </div>
         </header>
 
-        <section class="book-grid">
-            <article class="book-card" data-book-id="1">
-                <div class="cover-image-container">
-                    <img src="assets/images/book-cover1.jpg" alt="Book Title 1">
-                    <span class="badge badge-primary summary-length-badge">15-min read</span>
-                    <div class="actions-overlay"> <button class="btn-icon save-btn" title="Save">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                        </button>
-                        <button class="btn-icon download-btn" title="Download">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="book-title">The Silent Patient</h3>
-                    <p class="book-author">Alex Michaelides</p>
-                    <div class="card-actions"> <button class="btn-icon save-btn" title="Save">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                        </button>
-                        <button class="btn-icon download-btn" title="Download">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <article class="book-card" data-book-id="2">
-                <div class="cover-image-container">
-                    <img src="assets/images/book-cover2.jpg" alt="Book Title 2">
-                    <span class="badge badge-primary summary-length-badge">20-min read</span>
-                     <div class="actions-overlay">
-                        <button class="btn-icon save-btn" title="Save"><svg></svg></button>
-                        <button class="btn-icon download-btn" title="Download"><svg></svg></button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="book-title">Atomic Habits: An Easy & Proven Way to Build Good Habits & Break Bad Ones</h3>
-                    <p class="book-author">James Clear</p>
-                     <div class="card-actions">
-                        <button class="btn-icon save-btn" title="Save"><svg></svg></button>
-                        <button class="btn-icon download-btn" title="Download"><svg></svg></button>
-                    </div>
-                </div>
-            </article>
+        <section class="book-grid" id="bookGrid">
             </section>
     </main>
 
     <div class="modal-overlay" id="bookDetailModal">
-        <div class="modal-content" style="max-width: 800px;"> <button class="btn-icon modal-close-btn" aria-label="Close modal">&times;</button>
-            <div id="modalBookContent" class="d-flex" style="gap: 2rem;">
-                </svg> Save</button>
-                        <button class="btn-icon" id="modalDownloadBtn"><svg></svg> Download</button>
-                    </div>
-                    <div class="d-flex" style="gap:1rem;">
-                        <button class="btn btn-primary" id="readSummaryBtn">Read Summary</button>
-                        <button class="btn btn-secondary" id="listenSummaryBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5em; vertical-align: middle;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3S9 4 12 4s3 10 3 10h3a2 2 0 0 1 2 2z"></path></svg>
-                            Listen Summary
-                        </button>
-                    </div>
-                    <div id="summaryReaderView" style="display:none; margin-top:1.5rem; border-top: 1px solid var(--subtle-border); padding-top: 1.5rem;">
-                        <div class="d-flex justify-between align-center mb-1">
-                            <h4 style="margin-bottom:0;">Summary</h4>
-                            <span id="paginationInfo">Page 1 of Y</span>
-                        </div>
-                        <p id="summaryTextContent">Lorem ipsum dolor sit amet...</p>
-                        <div class="d-flex justify-between mt-1">
-                            <button class="btn btn-secondary btn-sm" id="prevPageBtn" disabled>&leftarrow; Previous</button>
-                            <button class="btn btn-secondary btn-sm" id="nextPageBtn">Next &rightarrow;</button>
-                        </div>
-                        <div id="postSummaryOptions" style="display:none; margin-top:1.5rem; text-align:center;">
-                             <button class="btn btn-primary" id="viewMindmapBtn">View Mindmap</button>
-                             <button class="btn btn-secondary" id="takeQuizBtn">Take Quiz</button>
-                        </div>
-                    </div>
-                     <div id="summaryListenerView" style="display:none; margin-top:1.5rem; border-top: 1px solid var(--subtle-border); padding-top: 1.5rem;">
-                        <p>Audio Player Placeholder (Play/Pause, Scrubber, Speed)</p>
-                        <div id="postListenOptions" style="display:none; margin-top:1.5rem; text-align:center;">
-                             <button class="btn btn-primary">View Mindmap</button>
-                             <button class="btn btn-secondary">Take Quiz</button>
-                        </div>
-                    </div>
-                </div>
-                -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalBookTitleHeader">Book Details</h2>
+                <button class="modal-close-btn" aria-label="Close modal" id="closeBookDetailModal">
+                    <i data-feather="x"></i>
+                </button>
             </div>
+            <div class="modal-body" id="modalBookContent">
+                </div>
         </div>
     </div>
 

@@ -46,18 +46,7 @@
             font-size: 1rem;
             margin-top: 1.5rem; /* More space before button */
         }
-        .login-container .signup-link {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        .login-container .signup-link a {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        .login-container .signup-link a:hover {
-            text-decoration: underline;
-        }
+        /* Removed sign-up link styles as it's removed from HTML */
     </style>
 </head>
 <body class="login-page">
@@ -79,8 +68,7 @@
                 <i data-feather="log-in"></i> Login
             </button>
         </form>
-        <p class="signup-link">Don't have an account? <a href="#signup">Sign Up</a></p>
-    </div>
+        </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -115,6 +103,7 @@
                     // Simulate successful login
                     localStorage.setItem('ketabinoUserLoggedIn', 'true'); // Simulate session
                     localStorage.setItem('ketabinoUserStreak', '5'); // Simulate streak
+                    localStorage.setItem('ketabinoUserName', 'Ketabino User'); // Simulate username
                     window.location.href = 'discover.html';
                 }
             });

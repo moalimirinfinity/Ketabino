@@ -1,16 +1,17 @@
+// js/main.js
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace(); // Initialize Feather Icons globally
 
     // --- User Authentication Simulation & Redirection ---
     const isLoggedIn = localStorage.getItem('ketabinoUserLoggedIn') === 'true';
-    const currentPage = window.location.pathname.split('/').pop();
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html'; // Default to index.html if path is empty
 
-    if (!isLoggedIn && currentPage !== 'login.html') {
-        window.location.href = 'login.html';
+    if (!isLoggedIn && currentPage !== 'index.html') {
+        window.location.href = 'index.html'; // Redirect to index.html if not logged in
         return; // Stop further execution if redirecting
     }
-    if (isLoggedIn && currentPage === 'login.html') {
-        window.location.href = 'discover.html'; // Redirect logged-in users away from login
+    if (isLoggedIn && currentPage === 'index.html') {
+        window.location.href = 'discover.html'; // Redirect logged-in users away from index (login) page
         return;
     }
 
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!mainNav || !streakBarContainer) return;
 
         const userStreak = localStorage.getItem('ketabinoUserStreak') || '0';
-        const userName = localStorage.getItem('ketabinoUserName') || 'User'; // Get username
+        const userName = localStorage.getItem('ketabinoUserName') || 'User';
 
         mainNav.innerHTML = `
             <div class="container">
@@ -84,7 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem('ketabinoUserLoggedIn');
                 localStorage.removeItem('ketabinoUserStreak');
                 localStorage.removeItem('ketabinoUserName');
-                window.location.href = 'login.html';
+                localStorage.removeItem('ketabinoBooksData'); // Clear book states on logout for fresh demo
+                window.location.href = 'index.html'; // Changed from login.html
             });
         }
 
@@ -97,19 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (settingsAnchor) {
                         settingsAnchor.scrollIntoView({ behavior: 'smooth' });
                     }
-                    if (userAvatarContainer) userAvatarContainer.classList.remove('active'); // Close dropdown
+                    if (userAvatarContainer) userAvatarContainer.classList.remove('active');
                 }
-                // If not on me.html, the default href will navigate.
+                // If not on me.html, the default href (me.html#settings-card-anchor) will navigate.
             });
         }
     }
-    if (currentPage !== 'login.html') {
+    if (currentPage !== 'index.html') { // Changed from login.html
         setupGlobalNav();
     }
 
 
     // --- Placeholder Book Data (with isSaved and isDownloaded) ---
-    // Attempt to load from localStorage or use defaults
     let booksData = JSON.parse(localStorage.getItem('ketabinoBooksData')) || {
         "1": { id: "1", title: "The Silent Patient", author: "Alex Michaelides", time: "15-min read", cover: "https://placehold.co/400x600/1A535C/FFFFFF?text=Silent+Patient", summaryPages: ["Summary page 1/3 for Silent Patient. Key insights...", "Page 2/3. Further discussion on themes...", "Page 3/3. Concluding thoughts and takeaways."], status: "finished", finishedDate: "May 28, 2024", progress: 100, isSaved: true, isDownloaded: false },
         "2": { id: "2", title: "Atomic Habits", author: "James Clear", time: "20-min read", cover: "https://placehold.co/400x600/FF6B6B/FFFFFF?text=Atomic+Habits", summaryPages: ["Summary page 1/2 for Atomic Habits. Core principles...", "Page 2/2. Practical application and benefits."], status: "in-progress", progress: 50, isSaved: true, isDownloaded: true },
@@ -154,9 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function displayBooks(searchTerm = '') {
+            if (!bookGrid) return; // Guard against null if element not found
             bookGrid.innerHTML = '';
             let booksToDisplay = Object.values(booksData);
-            const activeFilterTab = filterTabsNav.querySelector('.tab-link.active').dataset.filter;
+            const activeFilterTab = filterTabsNav ? filterTabsNav.querySelector('.tab-link.active').dataset.filter : 'all';
 
 
             if (searchTerm) {
@@ -165,9 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     book.author.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             } else if (activeFilterTab !== 'all') {
-                // This is a placeholder for actual category/trending/new filtering
-                // For now, it might not filter much beyond the search term.
-                // A real app would have more complex data and filtering logic here.
+                // Placeholder for category/trending/new filtering
                 console.log("Filtering by tab (not fully implemented):", activeFilterTab);
             }
 
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tab.addEventListener('click', () => {
                     filterTabsNav.querySelector('.active').classList.remove('active');
                     tab.classList.add('active');
-                    displayBooks(searchBarInput.value); // Re-filter with current search term and new tab
+                    displayBooks(searchBarInput ? searchBarInput.value : '');
                 });
             });
         }
@@ -223,13 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (book.status === 'in-progress') {
                 statusBadge = `<span class="badge badge-accent">In Progress</span>`;
             } else if (book.status === 'downloaded') {
-                statusBadge = `<span class="badge badge-info">Downloaded</span>`; // Changed to info
+                statusBadge = `<span class="badge badge-info">Downloaded</span>`;
             } else if (book.status === 'saved') {
                 statusBadge = `<span class="badge badge-light">Saved</span>`;
             }
 
             let progressHtml = '';
-            if (book.status === 'in-progress' && book.progress > 0) {
+            if (book.status === 'in-progress' && book.progress > 0 && book.progress < 100) {
                 progressHtml = `
                     <div class="library-item-progress-container">
                         <div class="library-item-progress-bar"><div class="progress" style="width: ${book.progress}%;"></div></div>
@@ -256,17 +256,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function displayLibraryBooks(filter = 'all') {
+            if (!libraryContentContainer) return;
             libraryContentContainer.innerHTML = '';
             let booksToDisplay = Object.values(booksData);
 
             if (filter !== 'all') {
                 booksToDisplay = booksToDisplay.filter(book => {
-                    if (filter === 'saved') return book.isSaved && book.status !== 'finished'; // Show saved unless also finished
+                    if (filter === 'saved') return book.isSaved; // Show all saved books
                     if (filter === 'downloaded') return book.isDownloaded;
                     return book.status === filter;
                 });
             }
-
 
             if (booksToDisplay.length === 0) {
                 libraryContentContainer.innerHTML = `
@@ -290,25 +290,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         displayLibraryBooks('all');
 
-        libraryTabsNav.querySelectorAll('.tab-link').forEach(tab => {
-            tab.addEventListener('click', () => {
-                libraryTabsNav.querySelector('.active').classList.remove('active');
-                tab.classList.add('active');
-                displayLibraryBooks(tab.dataset.filter);
+        if (libraryTabsNav) {
+            libraryTabsNav.querySelectorAll('.tab-link').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    libraryTabsNav.querySelector('.active').classList.remove('active');
+                    tab.classList.add('active');
+                    displayLibraryBooks(tab.dataset.filter);
+                });
             });
-        });
+        }
     }
 
     // --- "Me" Page Functionality ---
     if (currentPage === 'me.html') {
         const userStreak = localStorage.getItem('ketabinoUserStreak') || '0';
         const userName = localStorage.getItem('ketabinoUserName') || 'Ketabino User';
-        document.getElementById('profileUserName').textContent = userName;
-        document.getElementById('profileUserAvatar').style.backgroundImage = `url('https://placehold.co/120x120/1A535C/FFFFFF?text=${userName.substring(0,1).toUpperCase()}')`;
-        document.getElementById('profileStreak').textContent = `${userStreak} days`;
+        const profileUserName = document.getElementById('profileUserName');
+        const profileUserAvatar = document.getElementById('profileUserAvatar');
+        const profileStreak = document.getElementById('profileStreak');
+        const leaderboardUserName = document.getElementById('leaderboardUserName');
+        const leaderboardUserAvatar = document.getElementById('leaderboardUserAvatar');
 
-        document.getElementById('leaderboardUserName').textContent = `${userName} (You)`;
-        document.getElementById('leaderboardUserAvatar').src = `https://placehold.co/30x30/1A535C/FFFFFF?text=${userName.substring(0,1).toUpperCase()}`;
+
+        if(profileUserName) profileUserName.textContent = userName;
+        if(profileUserAvatar) profileUserAvatar.style.backgroundImage = `url('https://placehold.co/120x120/1A535C/FFFFFF?text=${userName.substring(0,1).toUpperCase()}')`;
+        if(profileStreak) profileStreak.textContent = `${userStreak} days`;
+
+        if(leaderboardUserName) leaderboardUserName.textContent = `${userName} (You)`;
+        if(leaderboardUserAvatar) leaderboardUserAvatar.src = `https://placehold.co/30x30/1A535C/FFFFFF?text=${userName.substring(0,1).toUpperCase()}`;
 
         const saveSettingsBtn = document.getElementById('saveSettingsBtn');
         if (saveSettingsBtn) {
@@ -322,16 +331,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Book Detail Modal Functionality (Shared) ---
     const bookDetailModal = document.getElementById('bookDetailModal');
     const modalBookContent = document.getElementById('modalBookContent') || document.getElementById('modalBookContentLib');
+    const modalBookTitleHeader = document.getElementById('modalBookTitleHeader');
     const closeBookDetailModalBtn = document.getElementById('closeBookDetailModal') || document.getElementById('closeBookDetailModalLib');
-
 
     function openBookDetailModal(bookId) {
         currentBookId = bookId;
         const book = booksData[currentBookId];
         if (!book || !modalBookContent || !bookDetailModal) return;
-        currentPageIndex = book.status === 'in-progress' ? Math.floor((book.progress / 100) * book.summaryPages.length) -1 : 0;
-        if (currentPageIndex < 0) currentPageIndex = 0;
 
+        // Determine initial page for summary reader
+        if (book.status === 'in-progress' && book.progress > 0 && book.progress < 100) {
+            currentPageIndex = Math.floor((book.progress / 100) * book.summaryPages.length);
+            // Ensure it's a valid index, not exceeding length - 1
+            currentPageIndex = Math.max(0, Math.min(currentPageIndex, book.summaryPages.length - 1));
+        } else {
+            currentPageIndex = 0; // Start from beginning for new or finished books
+        }
 
         modalBookContent.innerHTML = `
             <div class="modal-book-layout">
@@ -339,8 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="${book.cover}" alt="${book.title}">
                 </div>
                 <div class="modal-book-info">
-                    <h3 class="book-title">${book.title}</h3>
-                    <p class="book-author">By ${book.author}</p>
+                    <h3 class="book-title" style="font-size: 1.75rem; margin-bottom: 0.25rem;">${book.title}</h3>
+                    <p class="book-author" style="font-size: 1rem; color: var(--text-muted); margin-bottom: 0.75rem;">By ${book.author}</p>
                     <span class="badge badge-accent">${book.time}</span>
 
                     <div class="d-flex gap-1 mt-1 mb-2">
@@ -353,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="action-buttons">
-                        <button class="btn btn-primary" id="modalReadSummaryBtn"><i data-feather="eye"></i> ${book.progress > 0 && book.progress < 100 ? 'Continue Reading' : 'Read Summary'}</button>
+                        <button class="btn btn-primary" id="modalReadSummaryBtn"><i data-feather="eye"></i> ${book.status === 'in-progress' && book.progress < 100 ? 'Continue Reading' : 'Read Summary'}</button>
                         <button class="btn btn-secondary" id="modalListenSummaryBtn"><i data-feather="headphones"></i> Listen Summary</button>
                     </div>
 
@@ -391,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
-        document.getElementById('modalBookTitleHeader').textContent = book.title;
+        if (modalBookTitleHeader) modalBookTitleHeader.textContent = book.title;
         feather.replace();
         setupModalEventListeners();
         bookDetailModal.classList.add('active');
@@ -403,17 +418,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const readerView = document.getElementById('summaryReaderView');
         const listenerView = document.getElementById('summaryListenerView');
 
-        if (modalReadBtn) modalReadBtn.addEventListener('click', () => {
-            readerView.style.display = 'block';
-            listenerView.style.display = 'none';
-            // currentPageIndex is already set in openBookDetailModal
-            updateSummaryPageView();
-        });
-        if (modalListenBtn) modalListenBtn.addEventListener('click', () => {
-            readerView.style.display = 'none';
-            listenerView.style.display = 'block';
-            document.getElementById('postListenOptions').style.display = 'none';
-        });
+        if (modalReadBtn && readerView && listenerView) {
+             modalReadBtn.addEventListener('click', () => {
+                readerView.style.display = 'block';
+                listenerView.style.display = 'none';
+                updateSummaryPageView(); // Call to load the current or first page
+            });
+        }
+        if (modalListenBtn && readerView && listenerView) {
+            modalListenBtn.addEventListener('click', () => {
+                readerView.style.display = 'none';
+                listenerView.style.display = 'block';
+                const postListenOpts = document.getElementById('postListenOptions');
+                if (postListenOpts) postListenOpts.style.display = 'none';
+            });
+        }
 
         const prevBtn = document.getElementById('modalPrevPageBtn');
         const nextBtn = document.getElementById('modalNextPageBtn');
@@ -425,7 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const finishListenBtn = document.getElementById('modalFinishListeningBtn');
         if(finishListenBtn) finishListenBtn.addEventListener('click', () => {
-            document.getElementById('postListenOptions').style.display = 'block';
+            const postListenOpts = document.getElementById('postListenOptions');
+            if (postListenOpts) postListenOpts.style.display = 'block';
         });
 
         document.querySelectorAll('.modal-action-btn').forEach(btn => {
@@ -434,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (action === 'mindmap') {
                     alert('Opening Mindmap (Placeholder Action)');
                 } else if (action === 'quiz') {
+                    if (bookDetailModal) bookDetailModal.classList.remove('active'); // Close book detail modal first
                     startQuiz(currentBookId);
                 }
             });
@@ -464,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSummaryPageView() {
         const book = booksData[currentBookId];
-        if (!book || !book.summaryPages) return;
+        if (!book || !book.summaryPages || !document.getElementById('summaryTextContent')) return;
 
         document.getElementById('summaryTextContent').textContent = book.summaryPages[currentPageIndex];
         document.getElementById('modalPaginationInfo').textContent = `Page ${currentPageIndex + 1} of ${book.summaryPages.length}`;
@@ -474,27 +495,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const postSummaryOptions = document.getElementById('postSummaryOptions');
         if (currentPageIndex === book.summaryPages.length - 1) {
             postSummaryOptions.style.display = 'block';
-            // Update book status to finished if not already
             if (book.status !== 'finished') {
                 book.status = 'finished';
                 book.finishedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
                 book.progress = 100;
                 saveBooksData();
-                // Potentially refresh library view if on library page
                 if (currentPage === 'library.html') {
-                    const activeFilter = document.querySelector('#libraryTabsNav .tab-link.active').dataset.filter;
-                    displayLibraryBooks(activeFilter);
+                    const activeFilter = document.querySelector('#libraryTabsNav .tab-link.active');
+                    if (activeFilter) displayLibraryBooks(activeFilter.dataset.filter);
                 }
             }
         } else {
             postSummaryOptions.style.display = 'none';
         }
-        // Update progress
-        book.progress = Math.round(((currentPageIndex + 1) / book.summaryPages.length) * 100);
-        if (book.status !== 'finished' && book.progress > 0 && book.progress < 100) {
-            book.status = 'in-progress';
+        // Update progress only if not already finished
+        if (book.status !== 'finished') {
+            book.progress = Math.round(((currentPageIndex + 1) / book.summaryPages.length) * 100);
+             if (book.progress > 0 && book.progress < 100) {
+                book.status = 'in-progress';
+            }
+            saveBooksData();
         }
-        saveBooksData();
     }
 
 
@@ -510,7 +531,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addBookCardEventListeners() {
-        document.querySelectorAll('#bookGrid .book-card').forEach(card => {
+        const bookGrid = document.getElementById('bookGrid');
+        if (!bookGrid) return;
+        bookGrid.querySelectorAll('.book-card').forEach(card => {
             card.addEventListener('click', (event) => {
                 if (!event.target.closest('.btn-icon')) {
                     openBookDetailModal(card.dataset.bookId);
@@ -521,7 +544,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addLibraryItemEventListeners() {
-        document.querySelectorAll('#libraryContentContainer .library-item').forEach(item => {
+        const libContent = document.getElementById('libraryContentContainer');
+        if (!libContent) return;
+        libContent.querySelectorAll('.library-item').forEach(item => {
             item.querySelectorAll('.book-title-clickable, .continue-reading-btn').forEach(el => {
                 el.addEventListener('click', () => openBookDetailModal(item.dataset.bookId));
             });
@@ -547,8 +572,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 book.isSaved = !book.isSaved;
                 saveBtn.classList.toggle('saved', book.isSaved);
                 const icon = saveBtn.querySelector('i.feather-bookmark');
-                if (icon) icon.style.fill = book.isSaved ? 'var(--secondary-color)' : 'none';
-                if(bookDetailModal.classList.contains('active') && currentBookId === bookId){
+                if (icon) icon.style.fill = book.isSaved ? 'var(--secondary-color)' : 'none'; // Corrected fill logic
+                if(bookDetailModal && bookDetailModal.classList.contains('active') && currentBookId === bookId){
                     const modalSave = modalBookContent.querySelector('.modal-save-btn');
                     if(modalSave) {
                         modalSave.classList.toggle('saved', book.isSaved);
@@ -566,8 +591,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 book.isDownloaded = !book.isDownloaded;
                 downloadBtn.classList.toggle('downloaded', book.isDownloaded);
                 const icon = downloadBtn.querySelector('i.feather-download');
-                if (icon) icon.style.fill = book.isDownloaded ? 'var(--primary-color)' : 'none';
-                if(bookDetailModal.classList.contains('active') && currentBookId === bookId){
+                if (icon) icon.style.fill = book.isDownloaded ? 'var(--primary-color)' : 'none'; // Corrected fill logic
+                 if(bookDetailModal && bookDetailModal.classList.contains('active') && currentBookId === bookId){
                     const modalDownload = modalBookContent.querySelector('.modal-download-btn');
                     if(modalDownload) {
                         modalDownload.classList.toggle('downloaded', book.isDownloaded);
@@ -579,15 +604,34 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    function updateCardIconState(bookId, iconClass, isActive) {
-        const card = document.querySelector(`.book-card[data-book-id="${bookId}"]`);
+
+    function updateCardIconState(bookId, iconClassSelector, isActive) {
+        // Try to find card on Discover page
+        let card = document.querySelector(`#bookGrid .book-card[data-book-id="${bookId}"]`);
+        // If not found on Discover, try Library page
+        if (!card) {
+            card = document.querySelector(`#libraryContentContainer .library-item[data-book-id="${bookId}"]`);
+        }
+
         if(card) {
-            const iconBtn = card.querySelector(`.${iconClass}`);
+            const iconBtn = card.querySelector(`.${iconClassSelector}`); // Use the provided class selector
             if(iconBtn) {
-                const stateClass = iconClass.includes('save') ? 'saved' : 'downloaded';
+                const stateClass = iconClassSelector.includes('save') ? 'saved' : 'downloaded';
                 iconBtn.classList.toggle(stateClass, isActive);
                 const icon = iconBtn.querySelector('i');
-                if (icon) icon.style.fill = isActive ? (iconClass.includes('save') ? 'var(--secondary-color)' : 'var(--primary-color)') : 'none';
+                 if (icon) {
+                    let activeColor = 'none';
+                    if (isActive) {
+                        activeColor = iconClassSelector.includes('save') ? 'var(--secondary-color)' : 'var(--primary-color)';
+                    }
+                    icon.style.fill = activeColor;
+                    // Ensure stroke is also set if it was removed/changed by fill
+                    if (activeColor !== 'none') {
+                         icon.style.stroke = activeColor;
+                    } else {
+                        icon.style.stroke = 'currentColor'; // Reset to default stroke
+                    }
+                }
             }
         }
     }
@@ -605,103 +649,123 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizProgressText = document.getElementById('quizProgressText');
     const quizScoreText = document.getElementById('quizScoreText');
     const quizCloseResultsBtn = document.getElementById('quizCloseResultsBtn');
+    const quizModalFooter = document.getElementById('quizModalFooter');
 
 
     let currentQuizBookId = null;
-    let currentQuestionIndex = 0;
-    let score = 0;
+    let currentQuestionIndexQuiz = 0; // Renamed to avoid conflict
+    let scoreQuiz = 0; // Renamed
     let quizData = [];
 
     const sampleQuizBank = {
-        "1": [ // The Silent Patient
+        "1": [
             { question: "What is Alicia Berenson's profession in 'The Silent Patient'?", options: ["Doctor", "Painter", "Writer", "Musician"], answer: "Painter" },
             { question: "Who is Theo Faber in relation to Alicia?", options: ["Her husband", "Her therapist", "Her brother", "Her lawyer"], answer: "Her therapist" },
             { question: "What is the central mystery surrounding Alicia?", options: ["Her disappearance", "A hidden treasure", "Why she murdered her husband", "A secret identity"], answer: "Why she murdered her husband" }
         ],
-        "2": [ // Atomic Habits
-            { question: "What is the first law of behavior change according to James Clear?", options: ["Make it attractive", "Make it obvious", "Make it easy", "Make it satisfying"], answer: "Make it obvious" },
+        "2": [
+            { question: "What is the first law of behavior change according to James Clear in 'Atomic Habits'?", options: ["Make it attractive", "Make it obvious", "Make it easy", "Make it satisfying"], answer: "Make it obvious" },
             { question: "The concept of 'habit stacking' involves linking a new habit to an...", options: ["Existing reward", "Specific time", "Existing habit", "Desired outcome"], answer: "Existing habit" },
             { question: "What does James Clear emphasize for long-term success with habits?", options: ["Intensity", "Motivation", "Identity", "Perfection"], answer: "Identity" }
         ],
-        // Add more quizzes for other book IDs if needed
+        "3": [
+            { question: "According to 'Sapiens', what was the most important revolution in human history?", options: ["Industrial Revolution", "Agricultural Revolution", "Cognitive Revolution", "Scientific Revolution"], answer: "Cognitive Revolution" },
+            { question: "What concept does Harari discuss as a unique human ability to cooperate flexibly in large numbers?", options: ["Tool making", "Shared myths / Fictions", "Language complexity", "Fire control"], answer: "Shared myths / Fictions" },
+            { question: "Which of these is NOT a major part of the 'unification of humankind' discussed in Sapiens?", options: ["Monetary order", "Imperial orders", "Universal religions", "Genetic homogeneity"], answer: "Genetic homogeneity" }
+        ],
+         "4": [
+            { question: "What is the primary setting of Tara Westover's childhood in 'Educated'?", options: ["A Mormon compound in Utah", "A survivalist homestead in Idaho", "An Amish farm in Pennsylvania", "A communal ranch in Montana"], answer: "A survivalist homestead in Idaho" },
+            { question: "What significant injury does Tara's father, Gene, sustain?", options: ["Loses a leg in a farming accident", "Severe burns from an explosion", "Falls from a roof", "Car crash"], answer: "Severe burns from an explosion" },
+            { question: "Which university does Tara eventually attend for her PhD?", options: ["Harvard University", "Stanford University", "University of Cambridge", "Yale University"], answer: "University of Cambridge" }
+        ]
     };
 
     function startQuiz(bookId) {
+        if (!quizModal) return;
         currentQuizBookId = bookId;
-        quizData = sampleQuizBank[bookId] || sampleQuizBank["1"]; // Default to book 1's quiz if specific not found
-        currentQuestionIndex = 0;
-        score = 0;
+        // Ensure quizData for the book exists, otherwise use a default or show an error
+        quizData = sampleQuizBank[bookId] || sampleQuizBank["1"]; // Fallback to book "1" quiz
+        currentQuestionIndexQuiz = 0;
+        scoreQuiz = 0;
 
-        quizModalTitle.textContent = `Quiz: ${booksData[bookId] ? booksData[bookId].title : 'Book Quiz'}`;
-        quizQuestionArea.style.display = 'block';
-        quizResultsArea.style.display = 'none';
-        quizModalFooter.style.display = 'flex';
-        quizNextQuestionBtn.disabled = true;
-        quizFeedbackArea.style.display = 'none';
+        if (quizModalTitle) quizModalTitle.textContent = `Quiz: ${booksData[bookId] ? booksData[bookId].title : 'Book Quiz'}`;
+        if (quizQuestionArea) quizQuestionArea.style.display = 'block';
+        if (quizResultsArea) quizResultsArea.style.display = 'none';
+        if (quizModalFooter) quizModalFooter.style.display = 'flex';
+        if (quizNextQuestionBtn) quizNextQuestionBtn.disabled = true;
+        if (quizFeedbackArea) quizFeedbackArea.style.display = 'none';
 
         loadQuizQuestion();
-        if (quizModal) quizModal.classList.add('active');
+        quizModal.classList.add('active');
     }
 
     function loadQuizQuestion() {
-        const questionData = quizData[currentQuestionIndex];
-        quizQuestionText.textContent = questionData.question;
-        quizOptionsContainer.innerHTML = '';
-        quizFeedbackArea.style.display = 'none';
-        quizNextQuestionBtn.disabled = true;
-        quizProgressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        if (!quizData || currentQuestionIndexQuiz >= quizData.length) return;
+        const questionData = quizData[currentQuestionIndexQuiz];
 
+        if (quizQuestionText) quizQuestionText.textContent = questionData.question;
+        if (quizOptionsContainer) quizOptionsContainer.innerHTML = '';
+        if (quizFeedbackArea) quizFeedbackArea.style.display = 'none';
+        if (quizNextQuestionBtn) quizNextQuestionBtn.disabled = true;
+        if (quizProgressText) quizProgressText.textContent = `Question ${currentQuestionIndexQuiz + 1} of ${quizData.length}`;
 
         questionData.options.forEach((option, index) => {
-            const optionId = `q${currentQuestionIndex}_option${index}`;
+            const optionId = `q${currentQuestionIndexQuiz}_option${index}`;
             const optionLabel = document.createElement('label');
             optionLabel.className = 'quiz-option-label';
-            optionLabel.htmlFor = optionId;
+            optionLabel.htmlFor = optionId; // Not strictly needed if input is inside
             optionLabel.textContent = option;
 
-            const optionInput = document.createElement('input');
+            const optionInput = document.createElement('input'); // Not actually used for selection, label click is enough
             optionInput.type = 'radio';
-            optionInput.name = `q${currentQuestionIndex}_options`;
+            optionInput.name = `q${currentQuestionIndexQuiz}_options`;
             optionInput.id = optionId;
             optionInput.value = option;
+            optionInput.style.display = 'none'; // Hide the radio button
 
-            optionLabel.prepend(optionInput);
-            quizOptionsContainer.appendChild(optionLabel);
+            optionLabel.prepend(optionInput); // Keep for semantics
+            if (quizOptionsContainer) quizOptionsContainer.appendChild(optionLabel);
 
             optionLabel.addEventListener('click', () => handleOptionSelect(optionLabel, questionData.answer));
         });
-        feather.replace(); // If icons were used in options
     }
 
     function handleOptionSelect(selectedLabel, correctAnswer) {
-        // Disable further selections for this question
         quizOptionsContainer.querySelectorAll('.quiz-option-label').forEach(label => {
-            label.style.pointerEvents = 'none'; // Prevent re-clicking
+            label.style.pointerEvents = 'none';
+            // Remove previous selection styling if any (though pointerEvents should prevent re-click)
+            label.classList.remove('selected');
             if (label.textContent === correctAnswer) {
-                label.classList.add('correct');
+                label.classList.add('correct'); // Highlight correct answer regardless of user choice
             }
         });
 
+        selectedLabel.classList.add('selected'); // Mark the user's choice
         const selectedValue = selectedLabel.textContent;
-        quizFeedbackArea.style.display = 'block';
+
+        if (quizFeedbackArea) quizFeedbackArea.style.display = 'block';
 
         if (selectedValue === correctAnswer) {
-            score++;
-            selectedLabel.classList.add('correct');
-            quizFeedbackArea.textContent = "Correct!";
-            quizFeedbackArea.className = 'quiz-feedback correct';
+            scoreQuiz++;
+            selectedLabel.classList.add('correct'); // Re-apply if it was the correct one.
+            if (quizFeedbackArea) {
+                quizFeedbackArea.textContent = "Correct!";
+                quizFeedbackArea.className = 'quiz-feedback correct';
+            }
         } else {
             selectedLabel.classList.add('incorrect');
-            quizFeedbackArea.textContent = `Incorrect. The correct answer was: ${correctAnswer}`;
-            quizFeedbackArea.className = 'quiz-feedback incorrect';
+             if (quizFeedbackArea) {
+                quizFeedbackArea.textContent = `Incorrect. The correct answer was: ${correctAnswer}`;
+                quizFeedbackArea.className = 'quiz-feedback incorrect';
+            }
         }
-        quizNextQuestionBtn.disabled = false;
+        if (quizNextQuestionBtn) quizNextQuestionBtn.disabled = false;
     }
 
     if (quizNextQuestionBtn) {
         quizNextQuestionBtn.addEventListener('click', () => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizData.length) {
+            currentQuestionIndexQuiz++;
+            if (currentQuestionIndexQuiz < quizData.length) {
                 loadQuizQuestion();
             } else {
                 showQuizResults();
@@ -710,10 +774,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showQuizResults() {
-        quizQuestionArea.style.display = 'none';
-        quizResultsArea.style.display = 'block';
-        quizModalFooter.style.display = 'none'; // Hide next button on results
-        quizScoreText.textContent = `You scored ${score} out of ${quizData.length}!`;
+        if (quizQuestionArea) quizQuestionArea.style.display = 'none';
+        if (quizResultsArea) quizResultsArea.style.display = 'block';
+        if (quizModalFooter) quizModalFooter.style.display = 'none';
+        if (quizScoreText) quizScoreText.textContent = `You scored ${scoreQuiz} out of ${quizData.length}!`;
     }
 
     if (closeQuizModalBtn) closeQuizModalBtn.addEventListener('click', () => quizModal.classList.remove('active'));
