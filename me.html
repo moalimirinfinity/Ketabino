@@ -1,38 +1,296 @@
-<div style="display:grid; grid-template-columns: 1fr; gap:2rem; align-items:start; max-width:900px; margin:0 auto;">
-    <section class="profile-summary card p-2 text-center">
-        <img src="assets/images/avatar-placeholder.png" alt="User Avatar" style="width:120px; height:120px; border-radius:50%; margin:0 auto 1rem auto; border:3px solid var(--primary-color);">
-        <h2 style="font-size:1.8rem; margin-bottom:0.5rem;">Elite Reader</h2>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1rem; margin-bottom:1.5rem; text-align:left;">
-            <div class="stat-item"><strong>Current Streak:</strong> <span style="color:var(--secondary-color); font-weight:bold;">🔥 7 days</span></div>
-            <div class="stat-item"><strong>Summaries Done:</strong> 📚 42</div>
-            <div class="stat-item"><strong>Time Spent:</strong> ⏱️ 12h 30m</div>
-        </div>
-        <h3 style="font-size:1.2rem; text-align:left; margin-bottom:0.5rem;">Badges Earned</h3>
-        <div class="badges-grid" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
-            <div class="badge-item" title="First Summary!" style="width:60px; height:60px; background-color:var(--subtle-border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🏆</div>
-            <div class="badge-item" title="5-Day Streak" style="width:60px; height:60px; background-color:var(--subtle-border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🔥</div>
-            </div>
-    </section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Ketabino</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Single column by default */
+            gap: 2rem;
+            max-width: 900px; /* Max width for the whole profile section */
+            margin: 0 auto; /* Center the profile grid */
+        }
 
-    <section class="leaderboard card p-2">
-        <h2 style="text-align:center;">Leaderboard</h2>
-        <ol style="list-style:none; padding:0;">
-            <li class="d-flex align-center justify-between p-1" style="border-bottom:1px solid var(--subtle-border);">
-                <span>#1 (avatar) SpeedyReader</span> <span>2500 pts</span>
-            </li>
-            <li class="d-flex align-center justify-between p-1" style="border-bottom:1px solid var(--subtle-border); background-color: var(--neutral-bg); border-left:3px solid var(--secondary-color);">
-                <span>#5 (avatar) Elite (You)</span> <strong>1250 pts</strong>
-            </li>
-            </ol>
-    </section>
+        @media (min-width: 992px) { /* Two columns for larger screens */
+            .profile-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            /* Spanning behavior can be adjusted if needed, for now, default flow */
+        }
 
-    <section class="settings-panel card p-2">
-        <h2 style="text-align:center;">Settings</h2>
-        <div class="form-group">
-            <label>Email Preferences</label>
-            <div><input type="checkbox" id="newsletter" checked> <label for="newsletter" style="font-weight:normal; display:inline;">Newsletter</label></div>
-            <div><input type="checkbox" id="digest"> <label for="digest" style="font-weight:normal; display:inline;">Weekly Digest</label></div>
+
+        .profile-summary-card .user-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1rem auto;
+            border: 4px solid var(--primary-color);
+            background-size: cover;
+            background-position: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .profile-summary-card .user-name {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+        }
+        .profile-summary-card .user-title {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .stat-item {
+            background-color: var(--neutral-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .stat-item i.feather {
+            color: var(--primary-color);
+            width: 1.75rem;
+            height: 1.75rem;
+            flex-shrink: 0;
+        }
+        .stat-item .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .stat-item .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .badges-section .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-align: left;
+        }
+        .badges-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center; /* Center badges if they don't fill the row */
+        }
+        @media (min-width: 768px) {
+            .badges-grid {
+                justify-content: flex-start; /* Align left on larger screens */
+            }
+        }
+        .badge-item {
+            width: 60px;
+            height: 60px;
+            background-color: var(--subtle-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem; /* For emoji or icon */
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease;
+        }
+        .badge-item:hover {
+            transform: scale(1.1);
+        }
+
+        .leaderboard-card .leaderboard-list {
+            list-style: none;
+            padding: 0;
+        }
+        .leaderboard-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--subtle-border);
+            font-size: 0.95rem;
+        }
+        .leaderboard-list li:last-child {
+            border-bottom: none;
+        }
+        .leaderboard-list li.current-user {
+            background-color: rgba(255, 195, 0, 0.1); /* Accent bg */
+            border-left: 4px solid var(--accent-color);
+            padding-left: 0.75rem; /* Indent current user */
+            margin-left: -0.75rem; /* Adjust for padding */
+            margin-right: -0.75rem; /* Adjust for padding if card has padding */
+            border-radius: var(--border-radius-sm);
+        }
+        .leaderboard-list .user-rank { font-weight: 700; margin-right: 0.75rem; }
+        .leaderboard-list .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .leaderboard-list .user-info img { width: 30px; height: 30px; border-radius: 50%; }
+        .leaderboard-list .user-points { font-weight: 600; color: var(--primary-color); }
+
+        .settings-card .card-title { text-align: center; } /* Center title of settings card */
+        .settings-card #settingsForm {
+            max-width: 450px; /* Max width for the form itself */
+            margin: 0 auto; /* Center the form within the card */
+        }
+        .settings-card .form-group label { font-weight: 600; margin-bottom: 0.75rem;}
+        .settings-card .form-check { margin-bottom: 1rem; }
+
+        .activity-chart-card .card-title { text-align: center; }
+        .activity-chart-card .chart-placeholder {
+            height: 200px;
+            background-color: var(--neutral-bg);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        /* Anchor for scrolling */
+        #settings-card-anchor {
+            display: block;
+            position: relative;
+            top: -80px; /* Adjust based on fixed header height + desired offset */
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        </nav>
+
+    <div class="streak-progress-bar-container">
         </div>
-         <button class="btn btn-primary" style="display:block; margin: 1rem auto 0 auto;" id="editProfileBtn">Edit Profile</button>
-    </section>
-</div>
+
+    <main class="container">
+        <h1 class="page-title">My Profile</h1>
+
+        <div class="profile-grid">
+            <section class="profile-summary-card card text-center">
+                <div class="user-avatar-large" id="profileUserAvatar" style="background-image: url('https://placehold.co/120x120/1A535C/FFFFFF?text=U');"></div>
+                <h2 class="user-name" id="profileUserName">Elite Reader</h2>
+                <p class="user-title" id="profileUserTitle">Avid Learner & Bookworm</p>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <i data-feather="zap"></i>
+                        <div>
+                            <div class="stat-value" id="profileStreak">7 days</div>
+                            <div class="stat-label">Current Streak</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i data-feather="book-open"></i>
+                        <div>
+                            <div class="stat-value" id="profileSummaries">42</div>
+                            <div class="stat-label">Summaries Done</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i data-feather="clock"></i>
+                        <div>
+                            <div class="stat-value" id="profileTimeSpent">12h 30m</div>
+                            <div class="stat-label">Time Reading</div>
+                        </div>
+                    </div>
+                     <div class="stat-item">
+                        <i data-feather="star"></i>
+                        <div>
+                            <div class="stat-value" id="profilePoints">1250 pts</div>
+                            <div class="stat-label">Total Points</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="badges-section">
+                    <h3 class="section-title">Badges Earned</h3>
+                    <div class="badges-grid" id="profileBadgesGrid">
+                        <div class="badge-item" title="First Summary!"><i data-feather="award"></i></div>
+                        <div class="badge-item" title="5-Day Streak"><i data-feather="zap"></i></div>
+                        <div class="badge-item" title="Quiz Master"><i data-feather="check-circle"></i></div>
+                        <div class="badge-item" title="Early Bird"><i data-feather="sunrise"></i></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="leaderboard-card card">
+                <h2 class="card-title text-center">Leaderboard</h2>
+                <ol class="leaderboard-list" id="leaderboardList">
+                    <li>
+                        <span class="user-rank">1.</span>
+                        <span class="user-info">
+                            <img src="https://placehold.co/30x30/FF6B6B/FFFFFF?text=S" alt="User S"> SpeedyReader
+                        </span>
+                        <span class="user-points">2500 pts</span>
+                    </li>
+                    <li>
+                        <span class="user-rank">2.</span>
+                        <span class="user-info">
+                            <img src="https://placehold.co/30x30/1A535C/FFFFFF?text=B" alt="User B"> BookwormPro
+                        </span>
+                        <span class="user-points">2100 pts</span>
+                    </li>
+                    <li class="current-user">
+                        <span class="user-rank">5.</span>
+                        <span class="user-info">
+                            <img src="https://placehold.co/30x30/1A535C/FFFFFF?text=U" alt="User U" id="leaderboardUserAvatar"> <span id="leaderboardUserName">Elite (You)</span>
+                        </span>
+                        <span class="user-points" id="leaderboardUserPoints">1250 pts</span>
+                    </li>
+                    </ol>
+            </section>
+
+            <section class="activity-chart-card card">
+                <h2 class="card-title text-center">Activity (Last 30 Days)</h2>
+                <div class="chart-placeholder">
+                    Static Chart Placeholder (e.g., SVG)
+                </div>
+            </section>
+
+            <section class="settings-card card">
+                 <span id="settings-card-anchor"></span> <h2 class="card-title">Settings</h2>
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label>Email Preferences</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="newsletterCheck" checked>
+                            <label for="newsletterCheck">Newsletter Subscription</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="digestCheck">
+                            <label for="digestCheck">Weekly Digest</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notification Settings</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="reminderCheck" checked>
+                            <label for="reminderCheck">Reminders to Read</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="badgeAwardCheck" checked>
+                            <label for="badgeAwardCheck">Badge Award Notifications</label>
+                        </div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <button type="button" class="btn btn-primary" id="saveSettingsBtn"><i data-feather="save"></i> Save Settings</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
