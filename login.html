@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Ketabino</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        /* Specific styles for login page */
+        body.login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--neutral-bg);
+        }
+        .login-container {
+            background-color: var(--card-bg);
+            padding: 3rem 2.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        .login-container .logo {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .login-container h1 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+        .login-container .form-group {
+            text-align: left;
+        }
+        .login-container .btn-primary {
+            width: 100%;
+            padding: 0.9em 1.5em;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        .login-container .signup-link {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .login-container .signup-link a {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="logo">Ketabino</div>
+        <h1>Welcome Back</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <p class="signup-link">Don't have an account? <a href="#signup">Sign Up</a></p>
+    </div>
+
+    <script>
+        // Basic JS for login simulation
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent actual form submission
+            // const email = document.getElementById('email').value;
+            // const password = document.getElementById('password').value;
+
+            // Simulate validation (in a real app, this would be more complex)
+            // For prototype, directly redirect
+            alert('Login successful (simulation)! Redirecting to Discover page...');
+            window.location.href = 'discover.html'; // Redirect to discover page
+        });
+    </script>
+</body>
+</html>
