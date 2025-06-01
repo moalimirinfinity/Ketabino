@@ -3,7 +3,7 @@
 ## Overview
 Ketabino is a web-based platform that provides concise, interactive summaries of books. Users can discover new titles, read or listen to summaries, track their progress, and engage with post-summary features such as mindmaps and quizzes.
 
-**Demo:** [Demo Link](https://your-demo-link.com)
+**Demo:** [Demo Link](https://moalimirinfinity.github.io/Ketabino/)
 
 ---
 
