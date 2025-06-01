@@ -1,23 +1,191 @@
-<header class="page-header mb-2">
-    <h1>My Library</h1>
-</header>
-<div class="filter-tabs library-tabs"> <button class="btn active" data-filter="saved">Saved</button>
-    <button class="btn" data-filter="in-progress">In Progress</button>
-    <button class="btn" data-filter="downloaded">Downloaded</button>
-    <button class="btn" data-filter="finished">Finished</button>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Library - Ketabino</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .library-item {
+            display: flex;
+            align-items: flex-start; /* Align items to top for varying text lengths */
+            gap: 1.5rem;
+            padding: 1.25rem; /* More padding */
+            border-bottom: 1px solid var(--subtle-border);
+            transition: background-color 0.2s ease;
+        }
+        .library-item:last-child {
+            border-bottom: none;
+        }
+        .library-item:hover {
+            background-color: var(--neutral-bg); /* Subtle hover */
+        }
+        .library-item-cover img {
+            width: 70px; /* Slightly larger cover */
+            height: 105px;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        .library-item-info {
+            flex-grow: 1;
+        }
+        .library-item-info .item-title {
+            font-size: 1.15rem; /* Larger title */
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+        }
+        .library-item-info .item-title:hover {
+            color: var(--primary-color);
+        }
+        .library-item-info .item-author {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .library-item-info .item-status .badge {
+            font-size: 0.7rem;
+        }
+        .library-item-progress-container {
+            margin-top: 0.5rem;
+        }
+        .library-item-progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--subtle-border);
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+        }
+        .library-item-progress-bar .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%; /* JS will set this */
+            border-radius: var(--border-radius-sm);
+            transition: width 0.3s ease;
+        }
+        .library-item-progress-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        .library-item-actions {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically on small screens */
+            align-items: flex-end; /* Align to right */
+            gap: 0.5rem;
+            margin-left: 1rem; /* Space from info */
+            flex-shrink: 0; /* Prevent actions from shrinking */
+        }
+        .library-item-actions .btn {
+            min-width: 130px; /* Ensure buttons have some width */
+        }
 
-<section class="library-list">
-    <article class="library-item card mb-1 d-flex align-center" data-book-id="1">
-        <img src="assets/images/book-cover1.jpg" alt="Book Title 1" style="width:60px; height:80px; object-fit:cover; border-radius:var(--border-radius-sm); margin-right:1.5rem;">
-        <div style="flex-grow:1;">
-            <h3 style="font-size:1.2rem; margin-bottom:0.25rem;">The Silent Patient</h3>
-            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.5rem;">Alex Michaelides</p>
-            <span class="badge badge-light">Finished: May 28, 2025</span>
-            </div>
-        <div class="library-item-actions" style="margin-left:1rem; display:flex; flex-direction:column; gap:0.5rem;">
-            <button class="btn btn-secondary btn-sm">Review Mindmap</button>
-            <button class="btn btn-secondary btn-sm">Take Quiz</button>
+        @media (max-width: 767px) {
+            .library-item {
+                flex-direction: column;
+                align-items: center; /* Center items on mobile */
+                text-align: center;
+            }
+            .library-item-cover { margin-bottom: 1rem; }
+            .library-item-info { width: 100%; }
+            .library-item-actions {
+                flex-direction: row; /* Buttons side-by-side on mobile if space */
+                justify-content: center;
+                flex-wrap: wrap; /* Allow buttons to wrap */
+                width: 100%;
+                margin-top: 1rem;
+                margin-left: 0;
+            }
+        }
+
+        .empty-library-message {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .empty-library-message i.feather {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 1rem;
+            display: block; /* Center icon */
+            margin-left: auto;
+            margin-right: auto;
+            stroke-width: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        </nav>
+
+    <div class="streak-progress-bar-container">
         </div>
-    </article>
-    </section>
+
+    <main class="container">
+        <h1 class="page-title">My Library</h1>
+
+        <div class="tabs-nav" id="libraryTabsNav">
+            <button class="tab-link active" data-filter="all">All</button>
+            <button class="tab-link" data-filter="saved">Saved</button>
+            <button class="tab-link" data-filter="in-progress">In Progress</button>
+            <button class="tab-link" data-filter="downloaded">Downloaded</button>
+            <button class="tab-link" data-filter="finished">Finished</button>
+        </div>
+
+        <div id="libraryContentContainer"> </div>
+    </main>
+
+    <div class="modal-overlay" id="bookDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalBookTitleHeader">Book Details</h2>
+                <button class="modal-close-btn" aria-label="Close modal" id="closeBookDetailModalLib">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBookContentLib">
+                </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="quizModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="quizModalTitle">Book Quiz</h2>
+                <button class="modal-close-btn" aria-label="Close quiz modal" id="closeQuizModal">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="quizModalBody">
+                <div id="quizQuestionArea">
+                    <p class="quiz-progress" id="quizProgressText"></p>
+                    <p class="quiz-question-text" id="quizQuestionText"></p>
+                    <div class="quiz-options" id="quizOptionsContainer">
+                        </div>
+                    <div class="quiz-feedback" id="quizFeedbackArea" style="display: none;"></div>
+                </div>
+                <div id="quizResultsArea" style="display: none;">
+                    <h3>Quiz Completed!</h3>
+                    <p id="quizScoreText"></p>
+                    <div class="text-center">
+                        <button class="btn btn-primary" id="quizCloseResultsBtn">Close Quiz</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="quizModalFooter">
+                <button class="btn btn-secondary" id="quizNextQuestionBtn" disabled>
+                    Next Question <i data-feather="arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="js/main.js"></script>
+</body>
+</html>
