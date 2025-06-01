@@ -6,47 +6,48 @@
     <title>Login - Ketabino</title>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/components.css">
+    <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        /* Specific styles for login page */
         body.login-page {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             background-color: var(--neutral-bg);
+            padding-top: 0; /* Override body padding for login page */
         }
         .login-container {
             background-color: var(--card-bg);
-            padding: 3rem 2.5rem;
+            padding: 2.5rem 2rem; /* Adjusted padding */
             border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg); /* More prominent shadow */
             width: 100%;
-            max-width: 420px;
+            max-width: 400px; /* Slightly narrower */
             text-align: center;
         }
         .login-container .logo {
             font-family: var(--font-heading);
             font-weight: 800;
-            font-size: 2.5rem;
+            font-size: 2.25rem; /* Adjusted size */
             color: var(--primary-color);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
-        .login-container h1 {
-            font-size: 1.5rem;
+        .login-container .tagline {
+            font-size: 0.95rem;
+            color: var(--text-muted);
             margin-bottom: 2rem;
-            color: var(--text-dark);
         }
         .login-container .form-group {
             text-align: left;
         }
         .login-container .btn-primary {
             width: 100%;
-            padding: 0.9em 1.5em;
+            padding: 0.8em 1.5em; /* Adjusted padding */
             font-size: 1rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem; /* More space before button */
         }
         .login-container .signup-link {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             font-size: 0.9rem;
             color: var(--text-muted);
         }
@@ -54,37 +55,69 @@
             font-weight: 600;
             color: var(--primary-color);
         }
+        .login-container .signup-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="login-page">
     <div class="login-container">
         <div class="logo">Ketabino</div>
-        <h1>Welcome Back</h1>
+        <p class="tagline">Unlock knowledge, one summary at a time.</p>
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required>
-                </div>
+                <small class="form-validation-error" style="display:none;" id="emailError">Please enter a valid email.</small>
+            </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
-                </div>
-            <button type="submit" class="btn btn-primary">Login</button>
+                <small class="form-validation-error" style="display:none;" id="passwordError">Password cannot be empty.</small>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i data-feather="log-in"></i> Login
+            </button>
         </form>
         <p class="signup-link">Don't have an account? <a href="#signup">Sign Up</a></p>
     </div>
 
     <script>
-        // Basic JS for login simulation
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent actual form submission
-            // const email = document.getElementById('email').value;
-            // const password = document.getElementById('password').value;
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace(); // Initialize Feather Icons
 
-            // Simulate validation (in a real app, this would be more complex)
-            // For prototype, directly redirect
-            alert('Login successful (simulation)! Redirecting to Discover page...');
-            window.location.href = 'discover.html'; // Redirect to discover page
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let isValid = true;
+
+                // Basic validation
+                if (!emailInput.value || !emailInput.value.includes('@')) {
+                    emailError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    emailError.style.display = 'none';
+                }
+
+                if (!passwordInput.value) {
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    passwordError.style.display = 'none';
+                }
+
+                if (isValid) {
+                    // Simulate successful login
+                    localStorage.setItem('ketabinoUserLoggedIn', 'true'); // Simulate session
+                    localStorage.setItem('ketabinoUserStreak', '5'); // Simulate streak
+                    window.location.href = 'discover.html';
+                }
+            });
         });
     </script>
 </body>
