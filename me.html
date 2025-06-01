@@ -1,0 +1,38 @@
+<div style="display:grid; grid-template-columns: 1fr; gap:2rem; align-items:start; max-width:900px; margin:0 auto;">
+    <section class="profile-summary card p-2 text-center">
+        <img src="assets/images/avatar-placeholder.png" alt="User Avatar" style="width:120px; height:120px; border-radius:50%; margin:0 auto 1rem auto; border:3px solid var(--primary-color);">
+        <h2 style="font-size:1.8rem; margin-bottom:0.5rem;">Elite Reader</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1rem; margin-bottom:1.5rem; text-align:left;">
+            <div class="stat-item"><strong>Current Streak:</strong> <span style="color:var(--secondary-color); font-weight:bold;">🔥 7 days</span></div>
+            <div class="stat-item"><strong>Summaries Done:</strong> 📚 42</div>
+            <div class="stat-item"><strong>Time Spent:</strong> ⏱️ 12h 30m</div>
+        </div>
+        <h3 style="font-size:1.2rem; text-align:left; margin-bottom:0.5rem;">Badges Earned</h3>
+        <div class="badges-grid" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+            <div class="badge-item" title="First Summary!" style="width:60px; height:60px; background-color:var(--subtle-border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🏆</div>
+            <div class="badge-item" title="5-Day Streak" style="width:60px; height:60px; background-color:var(--subtle-border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🔥</div>
+            </div>
+    </section>
+
+    <section class="leaderboard card p-2">
+        <h2 style="text-align:center;">Leaderboard</h2>
+        <ol style="list-style:none; padding:0;">
+            <li class="d-flex align-center justify-between p-1" style="border-bottom:1px solid var(--subtle-border);">
+                <span>#1 (avatar) SpeedyReader</span> <span>2500 pts</span>
+            </li>
+            <li class="d-flex align-center justify-between p-1" style="border-bottom:1px solid var(--subtle-border); background-color: var(--neutral-bg); border-left:3px solid var(--secondary-color);">
+                <span>#5 (avatar) Elite (You)</span> <strong>1250 pts</strong>
+            </li>
+            </ol>
+    </section>
+
+    <section class="settings-panel card p-2">
+        <h2 style="text-align:center;">Settings</h2>
+        <div class="form-group">
+            <label>Email Preferences</label>
+            <div><input type="checkbox" id="newsletter" checked> <label for="newsletter" style="font-weight:normal; display:inline;">Newsletter</label></div>
+            <div><input type="checkbox" id="digest"> <label for="digest" style="font-weight:normal; display:inline;">Weekly Digest</label></div>
+        </div>
+         <button class="btn btn-primary" style="display:block; margin: 1rem auto 0 auto;" id="editProfileBtn">Edit Profile</button>
+    </section>
+</div>
